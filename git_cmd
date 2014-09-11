@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cmnt=$1
+cmnt="$1"
 
 if [ -z ${cmnt} ]; then
 	echo "Plz commit comment"

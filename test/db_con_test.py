@@ -16,10 +16,11 @@ def create_table(table):
 	
 	for line in lines:
 		if re.search(search_term, line):
-			pin = line.split('=')[1]
+			pin = line.split('=')[1].split('\n')[0]
 
 	try:
 		print('db connection pin : ' + pin )
+		print pin
 		db = MySQLdb.connect(host='dev-ocean1', port=3306, user='junermysql', passwd=pin, db='junerdev') 
 		cur = db.cursor()
 		print('table create')
@@ -33,4 +34,4 @@ def create_table(table):
 		print "I/O error"
 
 # db 접속 후 테이블 생성
-create_table('test1')
+create_table('test2')
