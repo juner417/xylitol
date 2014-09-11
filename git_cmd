@@ -1,5 +1,14 @@
+#!/bin/bash
+
+cmnt=$1
+
+if [ -z ${cmnt} ]; then
+	echo "Plz commit comment"
+	exit 1
+fi
+
 git status
 git add ./*
-git commit -m ""
-git remote add origin https://github.com/juner417/xylitol.git
+git commit -m "${cmnt}"
+#git remote add origin https://github.com/juner417/xylitol.git
 git push -u origin master
