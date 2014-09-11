@@ -7,10 +7,11 @@ import MySQLdb
 # cretae table function
 def create_table(table):
 	tbnm = table
+	pinfl = 
 
 	try:
 		print('db connection')
-		db = MySQLdb.connect(host='dev-ocean1', port=3306, user='junermysql', passwd='', db='junerdev')
+		db = MySQLdb.connect(host='dev-ocean1', port=3306, user='junermysql', passwd='Wnsgh11051223', db='junerdev')
 		cur = db.cursor()
 		print('table create')
 		sql = ''' CREATE TABLE IF NOT EXISTS %s
