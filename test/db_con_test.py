@@ -24,8 +24,10 @@ def create_table(table):
 		db = MySQLdb.connect(host='dev-ocean1', port=3306, user='junermysql', passwd=pin, db='junerdev') 
 		cur = db.cursor()
 		print('table create')
+		#sql = ''' CREATE TABLE IF NOT EXISTS %s
+		#		(no int, name char(16), dept char(16)) ''' % tbnm
 		sql = ''' CREATE TABLE IF NOT EXISTS %s
-				(no int, name char(16), dept char(16)) ''' % tbnm
+				(id int NOT NULL AUTO_INCREMENT, name char(30) NOT NULL, email char(30), passwd char(16), PRIMARY KEY (id) ) ''' % tbnm
 		cur.execute(sql)
 		print('table create done')
 		db.commit()
@@ -34,4 +36,5 @@ def create_table(table):
 		print "I/O error"
 
 # db 접속 후 테이블 생성
-create_table('test2')
+if __name__=="__main__":
+	create_table('user')
