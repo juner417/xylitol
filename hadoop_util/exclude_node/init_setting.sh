@@ -25,6 +25,7 @@ function fsync() {
 function create_lock() {
 	
 	file='/home/acc/status'
+	
 
 }
 
