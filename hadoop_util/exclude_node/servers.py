@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 import os, sys
-import socket, subprocess
+import socket, subprocess, pexpect
 import datetime, time
 import common.sendmail
 import logging
@@ -33,42 +33,94 @@ def check_decommissing(hostname, portnum):
     else :
         return False
 
-def run_procedure(hostname, proce_home):
-    
-    cmd = ['rsh', hostname,'sudo', proce_home+'/procfile.sh']
-    print(cmd)
-    
-    #subprocess.call(cmd, shell=False)
-    return True
+def rcp_lib(hostname, remote_acc, passwd, script_path):
+    # library file전송 
+    msg = 'Are you sure you want to continue connecting'
+    child = pexpect.spawn('rcp -r ' + script_path + '/' + ' ' + remote_acc + '@' 
+							+ hostname + ':/tmp/', timeout=60)
+    index = child.expect([msg, 'password', pexpect.EOF, pexpect.TIMEOUT])
 
-def run_service(server, service):
+    #print("%s scp first index:%s " % (script_path, index)) #debug 
+    if index == 0:
+        child.sendline('yes')
+        index = child.pexpect([msg, 'password', pexpect.EOF, pexpect.TIMEOUT])
 
-    print('start %s %s' % (server, service))
-    return True
+    if index == 1:
+        child.sendline(passwd)
+        child.expect(pexpect.EOF)
+        return True
+    elif index == 2:
+        # print('rcp second result %s' % child.before) #debug 
+        return True
+    else :
+        print('cannot connect to %s ' % hostname)
+        return False
 
-def run_additional_job(server, cmd):
-
-    print('start %s %s' % (server, cmd))
-    return True
-
-def get_uptime(server): 
-    
-    cmd = ['ssh', 'acc@'+server, 'cat /proc/uptime']
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    output, err = p.communicate()
-
-    if err is not None:
-        '''만약 서버가 reboot중일 경우 timeout일 경우 에러가 발생하므로 3시간 보다 큰 uptime을 너어 줘 
-           while문을 못 빠지게 함 ''' 
-        uptime = 20000
+def run_procedure(hostname, remote_acc, perm, passwd, script_path, script, args, script_timeout):
+    # run procedure - pexpect로 수정해야 함..
+    msg = 'Are you sure you want to continue connecting'
+    if perm == 'sudo':
+        cmd_prefix = 'sudo'
     else:
-        uptime = output.split()[0]
-    return uptime
+        cmd_prefix = ' '
 
-def check_server_status():
-    # os재설치 된 서버의 상태 확인
-    # os(kernel)version, uid(gid), ulimit, hostfile count, sysctl file, jdk version
-    print('hello') 
+    if script.split('.')[1] == 'py':
+        cmd_prefix = cmd_prefix + ' python'
+    
+    script_dir = script_path[script_path.rfind('/'):]
+    child = pexpect.spawn('rsh ' + remote_acc + '@' + hostname + ' ' + cmd_prefix + ' /tmp' + script_dir 
+                        + '/' + script + ' ' + args, timeout=script_timeout)
+    index = child.expect([msg, 'password', pexpect.EOF, pexpect.TIMEOUT])
+    # print("%s run_proc first index:%s " % (script, index)) #debug
+
+    if index == 0:
+        child.sendline('yes')
+        index = child.expect([msg, 'password', pexpect.EOF, pexpect.TIMEOUT])
+
+    if index == 1:
+        child.sendline(passwd)
+        child.expect(pexpect.EOF)
+        # print('index1 output : %s' % child.before) #debug
+        return True
+    elif index == 2:
+        print('%s script run result %s' % (script, child.before))
+        return True 
+    else:
+        print('cannot connect to %s and run %s' %(hostname, script))
+        return False
+
+def get_uptime(server):
+
+    msg = 'Are you sure you want to continue connecting'
+    
+    try:
+        child = pexpect.spawn('ssh acc@'+server+' cat /proc/uptime')
+        index = child.expect([msg, 'password', pexpect.EOF, pexpect.TIMEOUT])
+        # print('getuptime 1st index %s' %index) #debug 
+
+        if index == 0:
+            child.sendline ('yes')
+            index = child.expect([msg, 'password', pexpect.EOF, pexpect.TIMEOUT])
+
+        if index == 1:
+            child.sendline('acc_passwd')
+            child.expect(pexpect.EOF)
+            uptime = float(child.before.split()[0])
+            # print('index 1 uptime is : %s' %uptime) #debug 
+        elif index == 2:
+            print('cannot read server uptime')
+            try:
+                uptime = float(child.before.split()[0])
+                # print('uptime is float : %s' %uptime) #debug 
+            except:
+                print('except is occur :%s' % child.before)
+                # print('uptime is set 50000') #debug 
+                uptime = 50000
+    except:
+        print('uptime spawn except. will retry')
+        uptime = 50000
+
+    return uptime
 
 def send_mail(title, send, recv, mailfile):
         # 메일 전송
@@ -76,8 +128,7 @@ def send_mail(title, send, recv, mailfile):
         f = open(mailfile, 'r')
         msg = f.read().replace('\n','\r\n')
         f.close()
-        args = ['-v', '','-s',title, '-f',send, '-r',recv, '-m',msg]
-        print(args)
+        args = ['your mail api args ']
         common.sendmail.sendmail(args)
 
 def make_mail_file(mailfile, svr, event, msg):

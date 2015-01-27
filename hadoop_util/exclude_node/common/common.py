@@ -6,7 +6,7 @@ import os, sys, ConfigParser, getopt
 def print_usage():
 
     print ('WARN) check the args')
-    print ('USAGE) python remote_control.py -l LOADER_NAME -c COMMAND')
+    print ('USAGE) python your sctipt.py -c config')
     sys.exit(1)
 
 def getconf(filename, title, name):
@@ -34,3 +34,5 @@ def read_opt():
             sys.exit(2)
     
     return configfile
+
+

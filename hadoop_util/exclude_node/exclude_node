@@ -1,0 +1,2 @@
+svc1:hdfs,mapred,kafka
+svc2:hdfs,mapred,kafka,hive

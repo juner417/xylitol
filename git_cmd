@@ -9,6 +9,6 @@ fi
 
 git status
 git add ./*
-git commit -m "${cmnt}"
+git commit -a -m "${cmnt}"
 #git remote add origin https://github.com/juner417/xylitol.git
 git push -u origin master
