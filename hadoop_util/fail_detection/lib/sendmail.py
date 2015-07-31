@@ -9,6 +9,9 @@ from email import encoders
 import os, sys, getopt, base64
 from smtplib import SMTP
 
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
 def help():
     print "Usage :",sys.argv[0],"-v 'snmp-server' -s 'subject' -f 'from' -r 'recipient' -m 'message' [-t 'plain or html' -c 'cc' -a 'attachment']"
     print "       ",sys.argv[0],"-v 'snmp-server' -s 'subject' -f 'from' -r 'recipient' [-c 'cc' -a 'attachment'] << EOF"
