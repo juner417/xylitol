@@ -1,0 +1,7 @@
+#!/bin/bash
+cd /data/deploy/source/binary/kubernetes/cluster/addons/fluentd-elasticsearch/
+
+kubectl --server="172.19.130.162:8080" --namespace=kube-system create -f es-controller.yaml
+kubectl --server="172.19.130.162:8080" --namespace=kube-system create -f es-service.yaml
+kubectl --server="172.19.130.162:8080" --namespace=kube-system create -f kibana-controller.yaml
+kubectl --server="172.19.130.162:8080" --namespace=kube-system create -f kibana-service.yaml

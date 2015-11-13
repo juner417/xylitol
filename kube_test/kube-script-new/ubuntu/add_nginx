@@ -1,0 +1,8 @@
+#!/bin/bash
+
+#only pod
+#kubectl --server=http://172.19.130.162:8080/api create -f ../../docs/user-guide/walkthrough/pod-nginx.yaml
+#kubectl --server=http://172.19.130.162:8080/api create -f ../../docs/user-guide/walkthrough/pod-nginx2.yaml
+
+kubectl --server=http://172.19.130.162:8080/api create -f ../../docs/user-guide/walkthrough/replication-controller.yaml
+kubectl --server=http://172.19.130.162:8080/api create -f ../../docs/user-guide/walkthrough/service.yaml
